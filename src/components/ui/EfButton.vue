@@ -1,6 +1,6 @@
 <template>
   <div class="ef-button"
-       :class="{'text':text}"
+       :class="{'text':text,'disabled':disabled}"
        v-bind="$attrs"
   >
     <slot/>
@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-defineProps({text: Boolean})
+defineProps({text: Boolean, disabled: Boolean})
 </script>
 
 <style scoped lang="scss">
@@ -31,7 +31,7 @@ defineProps({text: Boolean})
   min-height: 48px;
   font-weight: 500;
 
-  &:not(.text) {
+  &:not(.text):not(.disabled) {
     color: white;
     background-color: #4E7942;
 
@@ -40,7 +40,7 @@ defineProps({text: Boolean})
     }
   }
 
-  &.text {
+  &.text:not(.disabled) {
     color: #4E7942;
     background-color: transparent;
 
@@ -48,6 +48,12 @@ defineProps({text: Boolean})
       color: #828282;
       background-color: #f2f2f2;
     }
+  }
+
+  &.disabled {
+    pointer-events: none;
+    background-color: #f2f2f2;
+    color: #828282;
   }
 
 }

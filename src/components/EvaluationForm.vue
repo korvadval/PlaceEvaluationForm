@@ -3,28 +3,31 @@
           :transition_name="transition_name"
   >
     <template #title>
-      <div ref="top_anchor_ref"/>
       <EfEvaluationHeader v-if="display_state.title"
                           :title="display_state.title"
                           :impact="display_state.impact"
       />
     </template>
     <template #fields>
-      <EfSendForm v-if="display_state.id==='send_form'"
-                  v-model:address="common_info.address"
-                  v-model:date="common_info.date"
-                  v-model:user_name="common_info.user_name"
-      />
-      <EfEvaluationForm v-else
-                        v-model="display_state.fields"
-                        :validation_group="display_state.id"
-      />
+      <template v-if="display_state.id!=='success_sent'">
+        <EfSendForm v-if="display_state.id==='send_form'"
+                    v-model:address="common_info.address"
+                    v-model:user_name="common_info.user_name"
+                    :disabled="is_sending"
+        />
+        <EfEvaluationForm v-else
+                          v-model="display_state.fields"
+                          :validation_group="display_state.id"
+        />
+      </template>
+      <EfSuccessSent v-else @restart-form="onRestartForm"/>
     </template>
-    <template #actions>
+    <template #actions v-if="display_state.id!=='success_sent'">
       <EfButton v-if="current_state_index > 0"
                 @click="prevState"
                 style="min-width: 120px"
                 text
+                :disabled="is_sending"
       >
         Назад
       </EfButton>
@@ -32,12 +35,14 @@
       <EfButton v-if="display_state.id==='send_form'"
                 @click="sendForm"
                 style="min-width: 180px"
+                :disabled="is_sending"
       >
         Отправить
       </EfButton>
       <EfButton v-else
                 @click="nextState"
                 style="min-width: 120px"
+                :disabled="is_sending"
       >
         Далее
       </EfButton>
@@ -51,14 +56,13 @@ import ValidationEngine from "@/core/ValidationEngine";
 import {EfButton, EfPage, EfEvaluationHeader} from "./ui";
 import {EfSendForm, EfEvaluationForm} from "./form-parts";
 import TGWorker from "@/core/TGWorker";
+import {EfSuccessSent} from "@/components/form-parts";
 
 const tg_worker = new TGWorker()
-const top_anchor_ref = ref(null)
 const validation_engine = new ValidationEngine()
 
 const common_info = reactive({
   address: '',
-  date: '',
   user_name: ''
 })
 const state_variants = [
@@ -135,9 +139,12 @@ const current_state_index = ref(0);
 const display_state = computed(() => {
   const next_state = state_variants[current_state_index.value]
   if (next_state) return next_state
+  if (display_state.value.id === 'send_form') return {id: 'success_sent'}
   return {id: 'send_form', title: 'Отправка формы'}
 });
 const transition_name = ref('slide-left');
+
+const is_sending = ref(false);
 
 const user_info = {
   id: null,
@@ -194,11 +201,12 @@ const calculateEvaluate = () => {
       + marketing_score + logistics_score + impressions_score
 }
 
-const nextState = () => {
-  const current_group = state_variants[current_state_index.value]
-  const validate_result = validation_engine.validateGroup(current_group.id)
-  if (!validate_result) return
-  top_anchor_ref.value.scrollIntoView()
+const nextState = (is_need_validate = true) => {
+  if (is_need_validate) {
+    const current_group = state_variants[current_state_index.value]
+    const validate_result = validation_engine.validateGroup(current_group.id)
+    if (!validate_result) return
+  }
   transition_name.value = 'slide-left';
   current_state_index.value++
 };
@@ -206,20 +214,35 @@ const prevState = () => {
   transition_name.value = 'slide-right';
   current_state_index.value--;
 };
-const sendForm = () => {
+const sendForm = async () => {
   const message = `
 ${getDate()}
 
 ${common_info.user_name} поставил оценку \`${calculateEvaluate()}\`
 помещению по адресу: \`${common_info.address}\`
 `
-  tg_worker.sendMessage(message)
+  is_sending.value = true
+  await tg_worker.sendMessage(message)
+  is_sending.value = false
+  nextState(false)
+}
+const clearForm = () => {
+  common_info.user_name = user_info.full_name || ''
+  common_info.address = ''
+  state_variants.forEach(variant => {
+    variant.fields.forEach(field => {
+      field.input_value.value = '';
+    });
+  });
 }
 
 const onKeyDown = (event) => {
   if (event.key === 'Enter') nextState()
 }
-
+const onRestartForm = () => {
+  clearForm()
+  current_state_index.value = 0
+}
 const addEnterListener = () => window.addEventListener('keydown', onKeyDown)
 
 const init = () => {

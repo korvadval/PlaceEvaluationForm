@@ -80,7 +80,7 @@ defineProps({
 /* --- Анимация смены страниц --- */
 .slide-left-enter-active, .slide-left-leave-active,
 .slide-right-enter-active, .slide-right-leave-active {
-  transition: transform 0.2s ease-in-out, opacity 0.2s;
+  transition: transform 200ms ease-in-out, opacity 200ms;
 }
 
 /* Вход слева */

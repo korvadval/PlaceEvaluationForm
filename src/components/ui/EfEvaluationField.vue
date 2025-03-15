@@ -48,7 +48,7 @@ const is_focused = ref(false)
 
 const init = () => {
   registerField()
-  if (props.is_autofocus) setTimeout(() => input_ref.value.focus(), 201)
+  if (props.is_autofocus) setTimeout(() => input_ref.value.focus(), 350)
 }
 
 const onFocus = (event) => {
