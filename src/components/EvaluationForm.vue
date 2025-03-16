@@ -137,7 +137,7 @@ const state_variants = [
     ]
   },
 ];
-const current_state_index = ref(9);
+const current_state_index = ref(0);
 const display_state = computed(() => {
   const next_state = state_variants[current_state_index.value]
   if (next_state) return next_state

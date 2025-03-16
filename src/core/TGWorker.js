@@ -1,5 +1,5 @@
 class TGWorker {
-    _bot_token = '7674966773:AAFfwue79okvFvMAoaCAk6nMAjgHSMgZTtw'
+    _bot_token = '8140648198:AAFqVjOWI4C26xa8iyIohQOzLeQP_ryx56M'
     _chat_id = '-4796963240'
 
     sendMessage(message) {
