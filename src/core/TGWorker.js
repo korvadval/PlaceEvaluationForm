@@ -1,6 +1,6 @@
 class TGWorker {
     _bot_token = '8140648198:AAFqVjOWI4C26xa8iyIohQOzLeQP_ryx56M'
-    _chat_id = '-4796963240'
+    _chat_id = '-1002628140502'
 
     sendMessage(message) {
         const url = `https://api.telegram.org/bot${this._bot_token}/sendMessage?chat_id=${this._chat_id}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
