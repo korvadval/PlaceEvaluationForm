@@ -137,7 +137,7 @@ const state_variants = [
     ]
   },
 ];
-const current_state_index = ref(0);
+const current_state_index = ref(9);
 const display_state = computed(() => {
   const next_state = state_variants[current_state_index.value]
   if (next_state) return next_state
@@ -223,7 +223,8 @@ ${getDate()}
 ${common_info.user_name} поставил оценку \`${calculateEvaluate()}\`
 помещению по адресу: \`${common_info.address}\`
 
-Комментарий: ${common_info.comment}
+Комментарий:
+${common_info.comment}
 `
   is_sending.value = true
   await tg_worker.sendMessage(message)

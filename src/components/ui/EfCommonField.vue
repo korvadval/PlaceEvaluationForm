@@ -15,11 +15,13 @@
     <textarea v-if="is_textarea"
               v-model="model"
               class="ef-common-field-textarea"
+              :class="{'error':has_error}"
               v-bind="$attrs"
               :tabindex="tabindex"
               @input="autoResize"
               @focus="onFocus"
               @blur="onBlur"
+              @click="has_error=false"
               @keydown.enter.stop
               ref="textarea_ref"
     />
@@ -123,6 +125,10 @@ onMounted(init)
 
     &:focus {
       border-color: #4E7942;
+    }
+
+    &.error {
+      border-color: #e04927;
     }
   }
 }

@@ -12,6 +12,7 @@
                    name="Ответственный"
                    :tabindex="2"
     />
+    <EfDivider/>
     <EfCommonField v-model="comment"
                    :validation_group="validation_group"
                    name="Комментарий"
