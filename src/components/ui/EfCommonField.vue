@@ -1,8 +1,9 @@
 <template>
   <div class="ef-common-field-container">
     <div class="ef-common-field-caption-name">{{ name }}</div>
-    <input v-model="model"
-           class="ef-common-field-field"
+    <input v-if="!is_textarea"
+           v-model="model"
+           class="ef-common-field-input"
            :class="{'error':has_error}"
            v-bind="$attrs"
            :tabindex="tabindex"
@@ -10,6 +11,17 @@
            @blur="onBlur"
            @click="has_error=false"
            ref="input_ref"
+    />
+    <textarea v-if="is_textarea"
+              v-model="model"
+              class="ef-common-field-textarea"
+              v-bind="$attrs"
+              :tabindex="tabindex"
+              @input="autoResize"
+              @focus="onFocus"
+              @blur="onBlur"
+              @keydown.enter.stop
+              ref="textarea_ref"
     />
     <EfBubbleError v-if="has_error" :text="error_message"/>
   </div>
@@ -25,30 +37,35 @@ const props = defineProps({
   validation_group: {type: String, default: ''},
   tabindex: {type: Number, default: 0},
   is_autofocus: {type: Boolean, default: false},
+  is_textarea: {type: Boolean, default: false}
 })
 const model = defineModel({required: true})
 
 const input_ref = ref(null)
+const textarea_ref = ref(null)
 const has_error = ref(false)
 const error_message = 'Обязательное поле.'
 
-const is_focused = ref(false)
-
 const init = () => {
   registerField()
-  // if (props.is_autofocus) setTimeout(() => input_ref.value.focus(), 201)
+  if (props.is_autofocus) setTimeout(() => input_ref.value.focus(), 201)
+  if (props.is_textarea) autoResize()
 }
 
 const onFocus = (event) => {
-  is_focused.value = true;
   has_error.value = false;
   event.target.select();
 };
 
-const onBlur = () => {
-  is_focused.value = false
-  validateField()
+const autoResize = () => {
+  const area = textarea_ref.value
+  if (area) {
+    area.style.height = 'auto'
+    area.style.height = (area.scrollHeight) + 'px'
+  }
 }
+
+const onBlur = () => validateField()
 
 const validateField = () => {
   has_error.value = !String(model.value).length
@@ -74,7 +91,7 @@ onMounted(init)
     color: #333;
   }
 
-  &-field {
+  &-input {
     height: 48px;
     width: 100%;
     padding: 12px;
@@ -90,6 +107,22 @@ onMounted(init)
 
     &.error {
       border-color: #e04927;
+    }
+  }
+
+  &-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #bdbdbd;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+    outline: none;
+    font-size: 16px;
+
+    resize: none;
+
+    &:focus {
+      border-color: #4E7942;
     }
   }
 }

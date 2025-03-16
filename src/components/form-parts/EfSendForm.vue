@@ -12,6 +12,12 @@
                    name="Ответственный"
                    :tabindex="2"
     />
+    <EfCommonField v-model="comment"
+                   :validation_group="validation_group"
+                   name="Комментарий"
+                   :tabindex="3"
+                   is_textarea
+    />
     <EfDivider/>
 
     <div v-if="disabled"
@@ -30,6 +36,7 @@ defineProps({
 
 const address = defineModel('address', {required: true})
 const user_name = defineModel('user_name', {required: true})
+const comment = defineModel('comment', {required: true})
 </script>
 
 <style lang="scss" scoped>

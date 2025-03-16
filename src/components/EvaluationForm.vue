@@ -13,6 +13,7 @@
         <EfSendForm v-if="display_state.id==='send_form'"
                     v-model:address="common_info.address"
                     v-model:user_name="common_info.user_name"
+                    v-model:comment="common_info.comment"
                     :disabled="is_sending"
         />
         <EfEvaluationForm v-else
@@ -63,7 +64,8 @@ const validation_engine = new ValidationEngine()
 
 const common_info = reactive({
   address: '',
-  user_name: ''
+  user_name: '',
+  comment: '',
 })
 const state_variants = [
   {
@@ -220,6 +222,8 @@ ${getDate()}
 
 ${common_info.user_name} поставил оценку \`${calculateEvaluate()}\`
 помещению по адресу: \`${common_info.address}\`
+
+Комментарий: ${common_info.comment}
 `
   is_sending.value = true
   await tg_worker.sendMessage(message)
